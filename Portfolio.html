@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATHIPAT & PLENGBHORN</title>
+    <style>
+        /* =========================================
+           CSS โครงสร้างหลัก
+           ========================================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        body, html { height: 100%; background-color: #000; color: #fff; overflow: hidden; }
+
+        header {
+            position: fixed; top: 0; width: 100%; padding: 2rem;
+            display: flex; justify-content: space-between; z-index: 100;
+            mix-blend-mode: difference; text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        .menu-btn { cursor: pointer; transition: opacity 0.3s; }
+        .menu-btn:hover { opacity: 0.6; }
+
+        .scroll-container {
+            height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory;
+            scrollbar-width: none; scroll-behavior: smooth;
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+
+        /* =========================================
+           หน้าแรก (Hero Section) สลับ 4 รูป
+           ========================================= */
+        .hero-section {
+            height: 100vh; width: 100%; scroll-snap-align: start;
+            position: relative; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute; inset: 0; background-size: cover; background-position: center;
+            opacity: 0; z-index: 1; animation: fadeAnim 16s infinite;
+        }
+
+        .fade-bg-1 { background-image: url('cover1.jpg'); animation-delay: 0s; }
+        .fade-bg-2 { background-image: url('cover2.jpg'); animation-delay: 4s; }
+        .fade-bg-3 { background-image: url('cover3.jpg'); animation-delay: 8s; }
+        .fade-bg-4 { background-image: url('cover4.jpg'); animation-delay: 12s; }
+
+        @keyframes fadeAnim {
+            0%, 100% { opacity: 0; transform: scale(1.05); }
+            10%, 25% { opacity: 1; transform: scale(1); }
+            35% { opacity: 0; transform: scale(1.05); }
+        }
+
+        .hero-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 2; }
+        .hero-title {
+            position: relative; z-index: 3; font-size: 5rem; font-weight: 300;
+            text-transform: uppercase; letter-spacing: 5px; text-align: center;
+        }
+
+        .scroll-hint {
+            position: absolute; bottom: 3rem; z-index: 3; font-size: 0.9rem;
+            letter-spacing: 2px; text-transform: uppercase; opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        /* =========================================
+           หน้าปกโปรเจกต์ต่างๆ
+           ========================================= */
+        .project-cover {
+            height: 100vh; width: 100%; scroll-snap-align: start;
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; transition: opacity 0.3s;
+        }
+        .project-cover::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.3); transition: background 0.3s; }
+        .project-cover:hover::after { background: rgba(0,0,0,0.1); }
+        .cover-title { position: relative; z-index: 2; font-size: 4rem; font-weight: 300; text-transform: uppercase; letter-spacing: 3px; text-align: center; }
+
+        /* =========================================
+           Sidebar Menu
+           ========================================= */
+        #menu-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 299;
+            opacity: 0; visibility: hidden; transition: all 0.4s ease;
+        }
+        #menu-overlay.active { opacity: 1; visibility: visible; }
+
+        #side-menu {
+            position: fixed; top: 0; right: 0; width: 25%; min-width: 320px; height: 100vh;
+            background-color: #111; color: #fff; z-index: 300;
+            transform: translateX(100%); transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1);
+            padding: 6rem 3rem; display: flex; flex-direction: column; gap: 4rem;
+        }
+        #side-menu.active { transform: translateX(0); }
+
+        .menu-section-title { font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; color: #666; margin-bottom: 1.5rem; }
+        .menu-item { font-size: 1.2rem; font-weight: 300; margin-bottom: 1rem; letter-spacing: 1px; }
+        .menu-link { color: #fff; text-decoration: none; transition: opacity 0.3s; text-transform: uppercase; }
+        .menu-link:hover { opacity: 0.5; }
+
+        /* =========================================
+           หน้ารายละเอียด Detail View (แบบ 2 คอลัมน์)
+           ========================================= */
+        #detail-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background-color: #f9f9f9; color: #111; z-index: 200;
+            overflow-y: auto; transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1);
+        }
+        #detail-view.active { transform: translateY(0); }
+        
+        .close-btn { 
+            position: fixed; top: 2rem; right: 2rem; font-size: 1rem; cursor: pointer; 
+            letter-spacing: 1px; z-index: 201; text-transform: uppercase; 
+            background: #f9f9f9; padding: 0.5rem 1rem; border-radius: 5px;
+        }
+
+        /* โครงสร้าง 2 คอลัมน์ */
+        .detail-content { 
+            max-width: 1400px; margin: 8rem auto 4rem; padding: 0 4rem; 
+            display: flex; gap: 4rem; align-items: flex-start;
+        }
+
+        /* คอลัมน์ซ้าย (ข้อความ) ล็อคตำแหน่งไว้ */
+        .detail-text-col {
+            flex: 0 0 35%; /* ขนาดความกว้างฝั่งข้อความ 35% */
+            position: sticky; top: 8rem; 
+        }
+
+        .detail-title { font-size: 3rem; font-weight: 400; margin-bottom: 0.5rem; text-transform: uppercase; line-height: 1.1; }
+        .detail-subtitle { font-size: 1.1rem; font-weight: 300; color: #666; margin-bottom: 2rem; }
+        .detail-desc { font-size: 1.1rem; line-height: 1.6; font-weight: 300; color: #333; }
+
+        /* คอลัมน์ขวา (รูปภาพ) */
+        .detail-images-col {
+            flex: 1; /* กินพื้นที่ที่เหลือ 65% */
+            display: flex; flex-direction: column; gap: 2rem;
+        }
+        .detail-images-col img { width: 100%; height: auto; display: block; }
+
+        /* รองรับหน้าจอมือถือ/แท็บเล็ต */
+        @media (max-width: 768px) {
+            .detail-content { flex-direction: column; padding: 0 2rem; margin-top: 6rem; gap: 2rem; }
+            .detail-text-col { position: relative; top: 0; width: 100%; flex: auto; }
+            .hero-title { font-size: 3rem; }
+            .cover-title { font-size: 2.5rem; padding: 0 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>ATHIPAT & PLENGBHORN</div>
+        <div class="menu-btn" onclick="openMenu()">CONTACT US</div>
+    </header>
+
+    <div class="scroll-container" id="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-bg fade-bg-1"></div>
+            <div class="hero-bg fade-bg-2"></div>
+            <div class="hero-bg fade-bg-3"></div>
+            <div class="hero-bg fade-bg-4"></div>
+            <div class="hero-overlay"></div>
+            
+            <h1 class="hero-title">Portfolio</h1>
+            <div class="scroll-hint">Scroll to discover</div>
+        </section>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <div id="menu-overlay" onclick="closeMenu()"></div>
+    <div id="side-menu">
+        <div class="close-btn" onclick="closeMenu()" style="background:none;">Close [X]</div>
+        
+        <div>
+            <div class="menu-section-title">Contact Us</div>
+            <div class="menu-item">T: +66 8X XXX XXXX</div>
+            <div class="menu-item">E: studio@example.com</div>
+        </div>
+
+        <div>
+            <div class="menu-section-title">Follow Us</div>
+            <div class="menu-item"><a href="#" class="menu-link" target="_blank">Instagram</a></div>
+            <div class="menu-item"><a href="#" class="menu-link" target="_blank">Facebook</a></div>
+        </div>
+    </div>
+
+    <!-- หน้ารายละเอียด (Detail View แบบ 2 คอลัมน์) -->
+    <div id="detail-view">
+        <div class="close-btn" onclick="closeDetail()">Close [X]</div>
+        
+        <div class="detail-content">
+            <!-- คอลัมน์ซ้าย: ข้อความ -->
+            <div class="detail-text-col">
+                <h1 class="detail-title" id="d-title"></h1>
+                <div class="detail-subtitle" id="d-subtitle"></div>
+                <p class="detail-desc" id="d-desc"></p>
+            </div>
+            
+            <!-- คอลัมน์ขวา: รูปภาพ -->
+            <div class="detail-images-col" id="d-images"></div>
+        </div>
+    </div>
+
+    <script>
+        function openMenu() {
+            document.getElementById('side-menu').classList.add('active');
+            document.getElementById('menu-overlay').classList.add('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('side-menu').classList.remove('active');
+            document.getElementById('menu-overlay').classList.remove('active');
+        }
+
+        // ถอด totalImages ออกทั้งหมดแล้ว ระบบจะดึงภาพเองอัตโนมัติ
+        const projects = [
+            { folder: 'mountainsea', title: 'Between Mountain & Sea', subtitle: 'Matthijs Villa', desc: 'Located on a hillside 190 meters above sea level, the villa is designed to capture the panoramic mountain view in front and the distant sea behind. The main building features a semi–outdoor walkway that creates a direct visual axis through the house, connecting the living area on one side and the master suite on the other. The architecture unfolds in three cascading levels from the main terrace to the pool deck and the lower guest villa — ensuring that each space enjoys an unobstructed view. With its low, open rooflines and natural materials, the villa blends quietly into the landscape, offering a serene and timeless connection to nature.with its hillside surroundings, creating a calm and timeless retreat.' },
+            { folder: 'threecourtyard', title: 'T(H)REE COURTYARD', subtitle: 'Three Family House: Koh Tao', desc: 'The porject overall layout is arranged around a large mango tree that becomes the heart of the composition. The central house serves as the main living hub for all family activities such as dining, cooking, and gathering, while the three surrounding houses are designed primarily for private living. This configuration creates a sense of togetherness through the shared courtyard while maintaining individual privacy. Most houses are oriented toward the canal view, except the parents’ house, which faces the entrance. This reflects their caring and protective nature, as they prefer to see family members coming and going rather than focusing on the view. It symbolizes their quiet guardianship, watching over the family and the home.' },
+            { folder: 'waterfront', title: 'The Waterfront', subtitle: 'Luxury Beach Front Villa: Koh Phangan', desc: 'This residence is designed as a tropical contemporary retreat that balances privacy and openness.' },
+            { folder: 'hillside', title: 'The Hillside Retreat', subtitle: 'Residential-Hospitality Hybrid Koh Phangan', desc: 'Nestled on a lush tropical hillside, the project reimagines a private residence that extends into a collection of boutique villas.' },
+            { folder: 'loftlamai', title: 'Pahili Loft Lamai', subtitle: 'Residential Apartment Development: Koh Samui', desc: 'The concept originates from the idea of tropical serenity through raw simplicity.' },
+            { folder: 'yume17', title: 'Yume 17', subtitle: 'Japanese-Inspired Residence', desc: 'Designed for a client deeply connected to Japanese culture, reflecting the values of simplicity, respect for nature, and honesty in materials.' },
+            { folder: 'coastline6', title: 'Coastline 6', subtitle: 'Boutique Residences: Koh Samui', desc: 'The design emphasizes openness and thermal comfort through passive strategies.' },
+            { folder: 'pahiliphangan', title: 'Pahili Pool Villas', subtitle: 'Boutique Villas: Koh Phangan', desc: 'Located within a secluded tropical valley on Koh Phangan’s northern coast, each villa embraces the island’s topography.' },
+            { folder: 'pahilibeach', title: 'Pahili Beach Samui', subtitle: 'Tropical Family Retreat Koh Samui', desc: 'Conceived as a modern tropical home that celebrates family connection and everyday simplicity.' },
+            { folder: 'forgebalance', title: 'Forge Balance', subtitle: 'Wellness Center: Koh Phangan', desc: 'Designed as a sanctuary of quiet luxury, Forge Balance brings together fitness, spa, and relaxation within a calm, refined atmosphere.' }
+        ];
+
+        const mainContainer = document.getElementById('main-container');
+
+        projects.forEach((proj, index) => {
+            const section = document.createElement('div');
+            section.className = 'project-cover';
+            section.style.backgroundImage = `url('${proj.folder}/1.jpg')`; 
+            section.innerHTML = `<h2 class="cover-title">${proj.title}</h2>`;
+            section.onclick = () => openDetail(index);
+            mainContainer.appendChild(section);
+        });
+
+        function openDetail(index) {
+            const proj = projects[index];
+            document.getElementById('d-title').innerText = proj.title;
+            document.getElementById('d-subtitle').innerText = proj.subtitle;
+            document.getElementById('d-desc').innerText = proj.desc;
+            
+            const imageContainer = document.getElementById('d-images');
+            imageContainer.innerHTML = ''; 
+
+            let imgIndex = 1; // เริ่มดึงจากรูปที่ 1.jpg
+
+            // ฟังก์ชันโหลดรูปอัตโนมัติจนกว่าจะหมด
+            function loadNextImage() {
+                const img = new Image();
+                img.src = `${proj.folder}/${imgIndex}.jpg`;
+                
+                img.onload = function() {
+                    imageContainer.appendChild(img);
+                    imgIndex++;
+                    loadNextImage(); // โหลดรูปถัดไปทันที
+                };
+                
+                img.onerror = function() {
+                    // ถ้ารูปไม่มี โค้ดจะหยุดโหลดเงียบๆ
+                };
+            }
+
+            loadNextImage(); // สั่งให้เริ่มทำงาน
+
+            document.getElementById('detail-view').scrollTop = 0;
+            document.getElementById('detail-view').classList.add('active');
+        }
+
+        function closeDetail() {
+            document.getElementById('detail-view').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
